@@ -40,7 +40,8 @@ export save_results_dir="./outputs"
 ```
 * We also support Gipuma to fusion(need to install [fusibile](https://github.com/YoYo000/fusibile)) . the script is borrowed from [MVSNet](https://github.com/YoYo000/MVSNet). 
 ```
-export save_results_dir="./outputs"
+<!-- export save_results_dir="/home/hqlab/workspace/reconstruction/CasMVSNet_output/DTU/test" -->
+export save_results_dir="/home/hqlab/workspace/reconstruction/CasMVSNet_output/blended/checkpoint1/test"
 ./test.sh  $CKPT_FILE --outdir $save_results_dir  --interval_scale 1.06  --filter_method gipuma
 ```
 

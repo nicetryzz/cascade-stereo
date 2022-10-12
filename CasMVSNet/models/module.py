@@ -305,8 +305,8 @@ def homo_warping(src_fea, src_proj, ref_proj, depth_values):
         rot = proj[:, :3, :3]  # [B,3,3]
         trans = proj[:, :3, 3:4]  # [B,3,1]
 
-        y, x = torch.meshgrid([torch.arange(0, height, dtype=torch.float32, device=src_fea.device),
-                               torch.arange(0, width, dtype=torch.float32, device=src_fea.device)])
+        y, x = torch.meshgrid(torch.arange(0, height, dtype=torch.float32, device=src_fea.device),
+                               torch.arange(0, width, dtype=torch.float32, device=src_fea.device),indexing='ij')
         y, x = y.contiguous(), x.contiguous()
         y, x = y.view(height * width), x.view(height * width)
         xyz = torch.stack((x, y, torch.ones_like(x)))  # [3, H*W]
@@ -321,8 +321,12 @@ def homo_warping(src_fea, src_proj, ref_proj, depth_values):
         proj_xy = torch.stack((proj_x_normalized, proj_y_normalized), dim=3)  # [B, Ndepth, H*W, 2]
         grid = proj_xy
 
+    # print("grid:{}".format(torch.isnan(grid).sum()))
+    # print("src_fea:{}".format(torch.isnan(src_fea).sum()))
+    
     warped_src_fea = F.grid_sample(src_fea, grid.view(batch, num_depth * height, width, 2), mode='bilinear',
                                    padding_mode='zeros')
+    # print("warped_src_fea:{}".format(torch.isnan(warped_src_fea).sum()))
     warped_src_fea = warped_src_fea.view(batch, channels, num_depth, height, width)
 
     return warped_src_fea
@@ -529,7 +533,7 @@ def cas_mvsnet_loss(inputs, depth_gt_ms, mask_ms, **kwargs):
     return total_loss, depth_loss
 
 
-def get_cur_depth_range_samples(cur_depth, ndepth, depth_inteval_pixel, shape, max_depth=192.0, min_depth=0.0):
+def get_cur_depth_range_samples(cur_depth, ndepth, depth_inteval_pixel, shape, max_depth=128.0, min_depth=0.0):
     #shape, (B, H, W)
     #cur_depth: (B, H, W)
     #return depth_range_values: (B, D, H, W)
@@ -550,7 +554,7 @@ def get_cur_depth_range_samples(cur_depth, ndepth, depth_inteval_pixel, shape, m
 
 
 def get_depth_range_samples(cur_depth, ndepth, depth_inteval_pixel, device, dtype, shape,
-                           max_depth=192.0, min_depth=0.0):
+                           max_depth=128.0, min_depth=0.0):
     #shape: (B, H, W)
     #cur_depth: (B, H, W) or (B, D)
     #return depth_range_samples: (B, D, H, W)

@@ -12,7 +12,7 @@ class DepthNet(nn.Module):
     def forward(self, features, proj_matrices, depth_values, num_depth, cost_regularization, prob_volume_init=None):
         proj_matrices = torch.unbind(proj_matrices, 1)
         assert len(features) == len(proj_matrices), "Different number of images and projection matrices"
-        assert depth_values.shape[1] == num_depth, "depth_values.shape[1]:{}  num_depth:{}".format(depth_values.shapep[1], num_depth)
+        assert depth_values.shape[1] == num_depth, "depth_values.shape[1]:{}  num_depth:{}".format(depth_values.shape[1], num_depth)
         num_views = len(features)
 
         # step 1. feature extraction
@@ -24,6 +24,7 @@ class DepthNet(nn.Module):
         ref_volume = ref_feature.unsqueeze(2).repeat(1, 1, num_depth, 1, 1)
         volume_sum = ref_volume
         volume_sq_sum = ref_volume ** 2
+        # print("ref_volume:{}".format(torch.isnan(ref_volume).sum()))
         del ref_volume
         for src_fea, src_proj in zip(src_features, src_projs):
             #warpped features
@@ -37,6 +38,7 @@ class DepthNet(nn.Module):
             if self.training:
                 volume_sum = volume_sum + warped_volume
                 volume_sq_sum = volume_sq_sum + warped_volume ** 2
+                # print("warped_volume:{}".format(torch.isnan(warped_volume).sum()))
             else:
                 # TODO: this is only a temporal solution to save memory, better way?
                 volume_sum += warped_volume
@@ -44,6 +46,8 @@ class DepthNet(nn.Module):
             del warped_volume
         # aggregate multiple feature volumes by variance
         volume_variance = volume_sq_sum.div_(num_views).sub_(volume_sum.div_(num_views).pow_(2))
+        # print("volum_sum:{}".format(torch.isnan(volume_sum).sum()))
+        # print("volum_squ:{}".format(torch.isnan(volume_sq_sum).sum()))
 
         # step 3. cost volume regularization
         cost_reg = cost_regularization(volume_variance)
@@ -54,6 +58,7 @@ class DepthNet(nn.Module):
             prob_volume_pre += prob_volume_init
 
         prob_volume = F.softmax(prob_volume_pre, dim=1)
+        # print("before_softmax:{}".format(torch.isnan(prob_volume_pre).sum()))
         depth = depth_regression(prob_volume, depth_values=depth_values)
 
         with torch.no_grad():

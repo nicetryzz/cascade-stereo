@@ -30,7 +30,7 @@ parser.add_argument('--lrepochs', type=str, default="10,12,14:2", help='epoch id
 parser.add_argument('--wd', type=float, default=0.0, help='weight decay')
 
 parser.add_argument('--batch_size', type=int, default=1, help='train batch size')
-parser.add_argument('--numdepth', type=int, default=192, help='the number of depth values')
+parser.add_argument('--numdepth', type=int, default=128, help='the number of depth values')
 parser.add_argument('--interval_scale', type=float, default=1.06, help='the number of depth values')
 
 parser.add_argument('--loadckpt', default=None, help='load a specific checkpoint')

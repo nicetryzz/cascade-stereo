@@ -29,7 +29,7 @@ parser.add_argument('--testpath_single_scene', help='testing data path for singl
 parser.add_argument('--testlist', help='testing scene list')
 
 parser.add_argument('--batch_size', type=int, default=1, help='testing batch size')
-parser.add_argument('--numdepth', type=int, default=192, help='the number of depth values')
+parser.add_argument('--numdepth', type=int, default=128, help='the number of depth values')
 
 parser.add_argument('--loadckpt', default=None, help='load a specific checkpoint')
 parser.add_argument('--outdir', default='./outputs', help='output dir')
@@ -59,7 +59,7 @@ parser.add_argument('--conf', type=float, default=0.9, help='prob confidence')
 parser.add_argument('--thres_view', type=int, default=5, help='threshold of num view')
 
 #filter by gimupa
-parser.add_argument('--fusibile_exe_path', type=str, default='../fusibile/fusibile')
+parser.add_argument('--fusibile_exe_path', type=str, default='/home/hqlab/workspace/reconstruction/fusibile/fusibile')
 parser.add_argument('--prob_threshold', type=float, default='0.9')
 parser.add_argument('--disp_threshold', type=float, default='0.25')
 parser.add_argument('--num_consistent', type=float, default='4')
